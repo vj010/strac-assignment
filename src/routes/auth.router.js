@@ -1,15 +1,74 @@
-const router = require("express").router;
+const router = require("express").Router();
 const axios = require("axios");
+const qs = require("qs");
 require("dotenv").config();
 
 function getAzureOAuthUrl() {
-  return ``;
+  const authCodeApiUrl = process.env.AUTHORIZATION_CODE_URL;
+  const clientId = process.env.CLIENT_ID;
+  const redirectUri = process.env.REDIRECT_URI;
+  return `${authCodeApiUrl}?client_id=${clientId}&scope=onedrive.readwrite%20offline_access&response_type=code&redirect_uri=${encodeURIComponent(
+    redirectUri
+  )}`;
+}
+
+async function getAccessAndRefreshToken(
+  accessTokenApiUrl,
+  code,
+  clientId,
+  redirectUri,
+  clientSecret
+) {
+  try {
+    const res = await axios.post(
+      accessTokenApiUrl,
+      qs.stringify({
+        code,
+        client_id: clientId,
+        redirect_uri: redirectUri,
+        client_secret: clientSecret,
+        grant_type: "authorization_code",
+      }),
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+    return res.data;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
 }
 
 router.get("/login", (req, res) => {
   const queryParams = req.queryParams;
   const redirectUr = getAzureOAuthUrl();
-  res.redirect(redirectUr, 302);
+  // res.json({ isSuccess: true });
+  res.redirect(302, redirectUr);
+});
+
+router.get("/oauth/login", async (req, res) => {
+  const queryParams = req.query;
+  const code = queryParams.code;
+  const codeRes = await getAccessAndRefreshToken(
+    process.env.ACCESS_TOKE_URL,
+    code,
+    process.env.CLIENT_ID,
+    process.env.REDIRECT_URI,
+    process.env.SECRET_VALUE
+  );
+  if (!codeRes) {
+    res.json({
+      isSuccess: false,
+      message: "Something went wrong. Token could not be acquired",
+    });
+  } else {
+    console.log("token data", codeRes);
+    res.json({ isSuccess: true, message: "token acquired" });
+  }
+  // res.redirect(redirectUr, 302);
 });
 
 module.exports = router;
