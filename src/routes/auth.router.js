@@ -1,6 +1,8 @@
 const router = require("express").Router();
 const axios = require("axios");
 const qs = require("qs");
+
+const tokens = require("../token-data");
 require("dotenv").config();
 
 function getAzureOAuthUrl() {
@@ -65,10 +67,12 @@ router.get("/oauth/login", async (req, res) => {
       message: "Something went wrong. Token could not be acquired",
     });
   } else {
-    console.log("token data", codeRes);
+    // console.log("token data", codeRes);
+    tokens.accessToken = codeRes.access_token;
+    tokens.refreshToken = codeRes.refresh_token;
+    tokens.userId = codeRes.user_id;
     res.json({ isSuccess: true, message: "token acquired" });
   }
-  // res.redirect(redirectUr, 302);
 });
 
 module.exports = router;

@@ -1,6 +1,7 @@
 const express = require("express");
 
 const authRouter = require("./routes/auth.router");
+const oneDriveRouter = require("./routes/onedrive.router");
 require("dotenv").config();
 
 const app = express();
@@ -11,7 +12,7 @@ app.use(express.json());
 app.use("/auth", authRouter);
 
 //router for one drive
-app.use("/onedrive", () => {});
+app.use("/onedrive", oneDriveRouter);
 
 const PORT = process.env.PORT || 4999;
 
