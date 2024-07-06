@@ -4,9 +4,19 @@ const axios = require("axios");
 const tokens = require("../token-data");
 require("dotenv").config();
 
-function getOneDriveFiles() {
-  return `https://login.live.com/oauth20_authorize.srf?client_id=7ae1e288-d76b-43a7-97de-399d5270c714&scope=offline_access
-    &response_type=token&redirect_uri=http://localhost:4999/login`;
+async function getAccessToken() {}
+
+async function getOneDriveFiles(accessToken, userId) {
+  try {
+    const microsoftGraphUrl = `${process.env.MICROSOFT_GRAPH_URL}/${userId}/drives`;
+    const res = await axios.get(microsoftGraphUrl, {
+      headers: { Authorization: `Bearer${accessToken}` },
+    });
+    return res.data;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
 }
 
 function downloadFile() {
@@ -15,9 +25,17 @@ function downloadFile() {
 
 function getUserListForFile() {}
 
-router.get("/getFilesList", (req, res) => {
-  const queryParams = req.queryParams;
-  // res.json({ tokens });
+router.get("/getFilesList", async (req, res) => {
+  const filesList = await getOneDriveFiles(tokens.accessToken, tokens.userId);
+  if (!filesList) {
+    res.json({
+      isSuccess: false,
+      message: "could not fetch files",
+      data: null,
+    });
+  } else {
+    res.json({ isSuccess: true, message: "success", data: filesList });
+  }
 });
 
 router.get("/downloadFile", (req, res) => {

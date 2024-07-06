@@ -9,7 +9,7 @@ function getAzureOAuthUrl() {
   const authCodeApiUrl = process.env.AUTHORIZATION_CODE_URL;
   const clientId = process.env.CLIENT_ID;
   const redirectUri = process.env.REDIRECT_URI;
-  return `${authCodeApiUrl}?client_id=${clientId}&scope=onedrive.readwrite%20offline_access&response_type=code&redirect_uri=${encodeURIComponent(
+  return `${authCodeApiUrl}?client_id=${clientId}&scope=files.readwrite.all%20offline_access&response_type=code&redirect_uri=${encodeURIComponent(
     redirectUri
   )}`;
 }
@@ -30,6 +30,7 @@ async function getAccessAndRefreshToken(
         redirect_uri: redirectUri,
         client_secret: clientSecret,
         grant_type: "authorization_code",
+        scope: "files.readwrite.all offline_access",
       }),
       {
         headers: {
@@ -67,7 +68,7 @@ router.get("/oauth/login", async (req, res) => {
       message: "Something went wrong. Token could not be acquired",
     });
   } else {
-    // console.log("token data", codeRes);
+    console.log("token data", codeRes);
     tokens.accessToken = codeRes.access_token;
     tokens.refreshToken = codeRes.refresh_token;
     tokens.userId = codeRes.user_id;
