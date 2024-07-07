@@ -13,10 +13,12 @@ async function getOneDriveFiles(accessToken, userId) {
       headers: { Authorization: `Bearer${accessToken}` },
     });
 
-    const filesList = res?.data?.value?.map((fileInfo) => ({
-      name: fileInfo.name,
-      id: fileInfo.id,
-    }));
+    const filesList = res?.data?.value
+      ?.filter((item) => item.file)
+      ?.map((fileInfo) => ({
+        name: fileInfo.name,
+        id: fileInfo.id,
+      }));
     return filesList;
   } catch (error) {
     console.log(error);
