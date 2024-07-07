@@ -3,6 +3,8 @@ const express = require("express");
 const authRouter = require("./routes/auth.router");
 const oneDriveRouter = require("./routes/onedrive.router");
 require("dotenv").config();
+// const { fork } = require("child_process");
+// const child = fork("./src/blessed.js");
 
 const app = express();
 
@@ -18,6 +20,7 @@ const PORT = process.env.PORT || 4999;
 
 app.listen(PORT, () => {
   console.log("server started on port:", PORT);
+  require("./console");
 });
 
 // Error-handling middleware

@@ -8,11 +8,16 @@ async function getAccessToken() {}
 
 async function getOneDriveFiles(accessToken, userId) {
   try {
-    const microsoftGraphUrl = `${process.env.MICROSOFT_GRAPH_URL}/${userId}/drives`;
+    const microsoftGraphUrl = `${process.env.MICROSOFT_GRAPH_URL}/drives/${process.env.ONE_DRIVE_ID}/root/children`;
     const res = await axios.get(microsoftGraphUrl, {
       headers: { Authorization: `Bearer${accessToken}` },
     });
-    return res.data;
+
+    const filesList = res?.data?.value?.map((fileInfo) => ({
+      name: fileInfo.name,
+      id: fileInfo.id,
+    }));
+    return filesList;
   } catch (error) {
     console.log(error);
     return null;

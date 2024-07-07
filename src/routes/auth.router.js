@@ -47,9 +47,10 @@ async function getAccessAndRefreshToken(
 
 router.get("/login", (req, res) => {
   const queryParams = req.queryParams;
-  const redirectUr = getAzureOAuthUrl();
+  const redirectUrl = getAzureOAuthUrl();
   // res.json({ isSuccess: true });
-  res.redirect(302, redirectUr);
+  res.status(200).send(redirectUrl);
+  res.end();
 });
 
 router.get("/oauth/login", async (req, res) => {
@@ -68,7 +69,7 @@ router.get("/oauth/login", async (req, res) => {
       message: "Something went wrong. Token could not be acquired",
     });
   } else {
-    console.log("token data", codeRes);
+    // console.log("token data", codeRes);
     tokens.accessToken = codeRes.access_token;
     tokens.refreshToken = codeRes.refresh_token;
     tokens.userId = codeRes.user_id;
