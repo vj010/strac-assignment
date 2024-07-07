@@ -63,10 +63,23 @@ async function listCommand() {
   //   console.log(res?.data);
 }
 
-function downloadCommand(fileId) {
+async function downloadCommand(fileId) {
+  console.log(white);
   if (!tokenData.accessToken) {
     console.log(authenticationErrorMessage);
+    return;
   }
+
+  const downloadRes = await axios.get(
+    `http://localhost:${process.env.PORT}/onedrive/downloadFile/${fileId}`
+  );
+
+  if (!downloadRes?.data?.isSuccess) {
+    console.log(downloadRes.message);
+    return;
+  }
+
+  console.log("file download complete");
 }
 
 function userListCommand(fileId) {
@@ -80,7 +93,7 @@ const commandInput = () => {
   rl.question(
     `${green}Supported Commands:    login     list    download <file-id>      user-list <file-id> \n`,
     async (answer) => {
-      const commandParts = answer?.trim()?.split("s+");
+      const commandParts = answer?.trim()?.split(/\s+/);
 
       //   console.log("commandParts", commandParts);
       //   readline.moveCursor(process.stdout, 0, -1); // Move cursor up one line
@@ -90,7 +103,7 @@ const commandInput = () => {
       } else if (commandParts[0] === "list") {
         await listCommand();
       } else if (commandParts[0] === "download") {
-        downloadCommand(commandParts[1]);
+        await downloadCommand(commandParts[1]);
       } else if (commandParts[0] === "user-list") {
         userListCommand(commandParts[1]);
       } else if (commandParts[0] === "exit") {
